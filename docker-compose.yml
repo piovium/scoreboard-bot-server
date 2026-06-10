@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: render-middleware
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - PORT=${PORT:-3000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - UPSTREAM_BASE_URL=${UPSTREAM_BASE_URL:-http://host.docker.internal:8080}
+      - REDIS_URL=redis://redis:6379/0
+      - CHROMIUM_WS_ENDPOINT=ws://chromium:3000
+      - SESSION_TTL=${SESSION_TTL:-300}
+      - COOKIE_TTL=${COOKIE_TTL:-86400}
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromium:
+        condition: service_started
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: render-middleware-redis
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  chromium:
+    image: chromedp/headless-shell:latest
+    container_name: render-middleware-chromium
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-port=3000
+      - --remote-debugging-address=0.0.0.0
+    ports:
+      - "9222:3000"
+    restart: unless-stopped
+
+volumes:
+  redis_data:
