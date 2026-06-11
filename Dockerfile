@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:26-alpine AS builder
 
 WORKDIR /app
 
@@ -7,12 +7,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY tsconfig.json ./
+COPY tsconfig.json vite.config.ts ./
 COPY src/ ./src/
 
 RUN pnpm run build
 
-FROM node:22-alpine
+FROM node:26-alpine
 
 WORKDIR /app
 
@@ -25,4 +25,4 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/server.mjs"]

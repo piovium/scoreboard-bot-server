@@ -1,15 +1,22 @@
-version: "3.9"
-
 services:
   app:
     build: .
     container_name: render-middleware
     ports:
-      - "${PORT:-3000}:3000"
+      - '${PORT:-3000}:3000'
     environment:
       - PORT=${PORT:-3000}
       - LOG_LEVEL=${LOG_LEVEL:-info}
-      - UPSTREAM_BASE_URL=${UPSTREAM_BASE_URL:-http://host.docker.internal:8080}
+      - PASSPORT_API_URL=${PASSPORT_API_URL:-https://passport-api.mihoyo.com}
+      - BIZ_API_URL=${BIZ_API_URL:-https://api-takumi.mihoyo.com}
+      - GAME_API_URL=${GAME_API_URL:-https://hk4e-api.mihoyo.com}
+      - RPC_APP_ID=${RPC_APP_ID:-cie2gjc0sg00}
+      - RPC_CLIENT_TYPE=${RPC_CLIENT_TYPE:-4}
+      - RPC_GAME_BIZ=${RPC_GAME_BIZ:-hk4e_cn}
+      - RPC_SDK_VERSION=${RPC_SDK_VERSION:-2.53.1}
+      - DEVICE_NAME=${DEVICE_NAME:-Chrome}
+      - DEVICE_MODEL=${DEVICE_MODEL:-Chrome 149.0.0.0}
+      - DEVICE_OS=${DEVICE_OS:-Windows 10 64-bit}
       - REDIS_URL=redis://redis:6379/0
       - CHROMIUM_WS_ENDPOINT=ws://chromium:3000
       - SESSION_TTL=${SESSION_TTL:-300}
@@ -27,7 +34,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 3s
       retries: 5
@@ -42,8 +49,6 @@ services:
       - --disable-dev-shm-usage
       - --remote-debugging-port=3000
       - --remote-debugging-address=0.0.0.0
-    ports:
-      - "9222:3000"
     restart: unless-stopped
 
 volumes:
