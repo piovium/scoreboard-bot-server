@@ -17,7 +17,7 @@ export function Layout(props: LayoutProps) {
           <script src="https://cdn.tailwindcss.com" />
           <style>{`
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+            body { font-family: HYWH, msyh, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
           `}</style>
         </head>
         <body class="bg-white">{props.children}</body>
