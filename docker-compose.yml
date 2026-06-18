@@ -18,7 +18,7 @@ services:
       - DEVICE_MODEL=${DEVICE_MODEL:-Chrome 149.0.0.0}
       - DEVICE_OS=${DEVICE_OS:-Windows 10 64-bit}
       - REDIS_URL=redis://redis:6379/0
-      - CHROMIUM_WS_ENDPOINT=ws://chromium:3000
+      - CHROMIUM_WS_ENDPOINT=http://chromium:9222
       - SESSION_TTL=${SESSION_TTL:-300}
       - COOKIE_TTL=${COOKIE_TTL:-86400}
     depends_on:
@@ -47,8 +47,6 @@ services:
       - --no-sandbox
       - --disable-gpu
       - --disable-dev-shm-usage
-      - --remote-debugging-port=3000
-      - --remote-debugging-address=0.0.0.0
     restart: unless-stopped
 
 volumes:
