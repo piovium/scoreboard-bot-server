@@ -7,6 +7,7 @@ services:
     environment:
       - PORT=${PORT:-3000}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      - TZ=${TZ:-Asia/Shanghai}
       - PASSPORT_API_URL=${PASSPORT_API_URL:-https://passport-api.mihoyo.com}
       - BIZ_API_URL=${BIZ_API_URL:-https://api-takumi.mihoyo.com}
       - GAME_API_URL=${GAME_API_URL:-https://hk4e-api.mihoyo.com}
@@ -30,6 +31,8 @@ services:
 
   redis:
     image: redis:7-alpine
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
     container_name: render-middleware-redis
     volumes:
       - redis_data:/data
@@ -46,6 +49,8 @@ services:
       dockerfile: Dockerfile.chromium
     image: dyebleach-chromium:latest
     container_name: render-middleware-chromium
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
     command:
       - --no-sandbox
       - --disable-gpu

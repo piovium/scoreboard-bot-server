@@ -16,7 +16,7 @@ FROM node:26-alpine
 
 WORKDIR /app
 
-RUN npm i -g pnpm@10
+RUN apk add --no-cache tzdata && npm i -g pnpm@10
 
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
