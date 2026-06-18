@@ -41,7 +41,10 @@ services:
     restart: unless-stopped
 
   chromium:
-    image: chromedp/headless-shell:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.chromium
+    image: dyebleach-chromium:latest
     container_name: render-middleware-chromium
     command:
       - --no-sandbox
