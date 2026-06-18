@@ -21,10 +21,12 @@ export async function health(c: Context): Promise<Response> {
 
   let upstreamStatus: HealthStatus['upstream'] = 'ok';
   try {
-    const res = await fetch(`${env.PASSPORT_API_URL}/health`, {
+    const res = await fetch(env.PASSPORT_API_URL, {
+      method: 'HEAD',
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) upstreamStatus = 'error';
+    // miHoYo does not expose a public /health endpoint; 404 still proves reachability.
+    if (res.status >= 500) upstreamStatus = 'error';
   } catch {
     upstreamStatus = 'error';
   }

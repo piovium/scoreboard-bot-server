@@ -1,4 +1,5 @@
 import puppeteer, { type Browser } from 'puppeteer-core';
+import { lookup } from 'node:dns/promises';
 import { getEnv } from '../config.ts';
 import { logger } from '../lib/logger.ts';
 
@@ -19,11 +20,15 @@ export async function getBrowser(): Promise<Browser> {
   }
 
   if (env.CHROMIUM_WS_ENDPOINT) {
-    // Remote mode: connect to existing headless Chromium (Docker chromedp/headless-shell)
-    _browser = await puppeteer.connect({
-      browserWSEndpoint: env.CHROMIUM_WS_ENDPOINT,
-    });
-    logger.info({ endpoint: env.CHROMIUM_WS_ENDPOINT }, 'Connected to remote Chromium');
+    // Remote mode: connect to existing headless Chromium.
+    // Accept either a real WebSocket endpoint (ws://.../devtools/browser/...) or
+    // an HTTP DevTools base URL (http://host:9222) which is friendlier for Docker.
+    const endpoint = await normalizeChromiumEndpoint(env.CHROMIUM_WS_ENDPOINT);
+    const connectOptions = endpoint.startsWith('http')
+      ? { browserURL: endpoint }
+      : { browserWSEndpoint: endpoint };
+    _browser = await puppeteer.connect(connectOptions);
+    logger.info({ endpoint }, 'Connected to remote Chromium');
   } else {
     // Local mode: launch installed Chrome/Chromium
     const executablePath = env.CHROME_PATH;
@@ -64,4 +69,22 @@ export async function healthCheck(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function normalizeChromiumEndpoint(endpoint: string): Promise<string> {
+  if (!endpoint.startsWith('http')) return endpoint;
+
+  // Chrome rejects non-localhost Host headers on the DevTools HTTP endpoint.
+  // In Docker Compose, resolve service names to IPs first so Puppeteer can fetch /json/version.
+  const url = new URL(endpoint);
+  if (url.hostname !== 'localhost' && url.hostname !== '127.0.0.1' && !/^\d+\.\d+\.\d+\.\d+$/.test(url.hostname)) {
+    try {
+      const { address } = await lookup(url.hostname, { family: 4 });
+      url.hostname = address;
+      return url.toString().replace(/\/$/, '');
+    } catch (err) {
+      logger.warn({ endpoint, err }, 'Failed to resolve Chromium hostname; using original endpoint');
+    }
+  }
+  return endpoint;
 }

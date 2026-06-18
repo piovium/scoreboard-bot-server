@@ -2,9 +2,7 @@ FROM node:26-alpine AS builder
 
 WORKDIR /app
 
-RUN npm i -g corepack
-
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm i -g pnpm@10
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
@@ -18,7 +16,7 @@ FROM node:26-alpine
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm i -g pnpm@10
 
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
