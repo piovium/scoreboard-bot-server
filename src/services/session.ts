@@ -22,7 +22,12 @@ export class SessionManager {
     let deviceId = await redis.get(deviceKey);
     if (!deviceId) {
       deviceId = randomUUID();
-      await redis.setex(deviceKey, getEnv().COOKIE_TTL, deviceId);
+      const ttl = getEnv().COOKIE_TTL;
+      if (ttl > 0) {
+        await redis.setex(deviceKey, ttl, deviceId);
+      } else {
+        await redis.set(deviceKey, deviceId);
+      }
       logger.info({ userId, deviceId }, 'Created new device UUID');
     }
     return deviceId;
@@ -63,7 +68,9 @@ export class SessionManager {
     const redis = getRedis();
     const key = this.redisKey(userId);
     const ttl = this.getTtl(state);
-    await redis.multi().hset(key, 'state', state).expire(key, ttl).exec();
+    const multi = redis.multi().hset(key, 'state', state);
+    if (ttl > 0) multi.expire(key, ttl);
+    await multi.exec();
 
     logger.info({ userId, state }, 'Session state updated');
   }

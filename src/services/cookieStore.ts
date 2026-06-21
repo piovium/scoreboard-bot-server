@@ -27,7 +27,11 @@ export class CookieStore {
     const redis = getRedis();
     const serialized = await jar.serialize();
     const ttl = getEnv().COOKIE_TTL;
-    await redis.setex(this.redisKey(userId), ttl, JSON.stringify(serialized));
+    if (ttl > 0) {
+      await redis.setex(this.redisKey(userId), ttl, JSON.stringify(serialized));
+    } else {
+      await redis.set(this.redisKey(userId), JSON.stringify(serialized));
+    }
     logger.debug({ userId }, 'Cookie jar saved to Redis');
   }
 

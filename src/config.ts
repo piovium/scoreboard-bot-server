@@ -32,7 +32,11 @@ const envSchema = z.object({
   CHROME_PATH: z.string().optional().default(''),
 
   SESSION_TTL: z.coerce.number().int().positive().default(300),
-  COOKIE_TTL: z.coerce.number().int().positive().default(86400),
+  COOKIE_TTL: z.coerce
+    .number()
+    .int()
+    .refine((v) => v > 0 || v === -1, 'Must be positive or -1 for no expiry')
+    .default(-1),
 });
 
 export type Env = z.infer<typeof envSchema>;
