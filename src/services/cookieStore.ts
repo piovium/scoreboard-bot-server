@@ -1,6 +1,5 @@
 import { CookieJar } from 'tough-cookie';
 import { getRedis } from '../lib/redis.ts';
-import { getEnv } from '../config.ts';
 import { logger } from '../lib/logger.ts';
 
 export class CookieStore {
@@ -26,12 +25,7 @@ export class CookieStore {
   async saveJar(userId: string, jar: CookieJar): Promise<void> {
     const redis = getRedis();
     const serialized = await jar.serialize();
-    const ttl = getEnv().COOKIE_TTL;
-    if (ttl > 0) {
-      await redis.setex(this.redisKey(userId), ttl, JSON.stringify(serialized));
-    } else {
-      await redis.set(this.redisKey(userId), JSON.stringify(serialized));
-    }
+    await redis.set(this.redisKey(userId), JSON.stringify(serialized));
     logger.debug({ userId }, 'Cookie jar saved to Redis');
   }
 

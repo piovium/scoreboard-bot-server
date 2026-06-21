@@ -21,7 +21,6 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CHROMIUM_WS_ENDPOINT=http://chromium:9222
       - SESSION_TTL=${SESSION_TTL:-300}
-      - COOKIE_TTL=${COOKIE_TTL:-86400}
     depends_on:
       redis:
         condition: service_healthy

@@ -10,7 +10,7 @@ export class SessionManager {
   }
 
   private getTtl(state: SessionState): number {
-    if (state === 'LOGGED_IN') return getEnv().COOKIE_TTL;
+    if (state === 'LOGGED_IN') return -1;
     return getEnv().SESSION_TTL;
   }
 
@@ -22,12 +22,7 @@ export class SessionManager {
     let deviceId = await redis.get(deviceKey);
     if (!deviceId) {
       deviceId = randomUUID();
-      const ttl = getEnv().COOKIE_TTL;
-      if (ttl > 0) {
-        await redis.setex(deviceKey, ttl, deviceId);
-      } else {
-        await redis.set(deviceKey, deviceId);
-      }
+      await redis.set(deviceKey, deviceId);
       logger.info({ userId, deviceId }, 'Created new device UUID');
     }
     return deviceId;

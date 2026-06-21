@@ -32,11 +32,6 @@ const envSchema = z.object({
   CHROME_PATH: z.string().optional().default(''),
 
   SESSION_TTL: z.coerce.number().int().positive().default(300),
-  COOKIE_TTL: z.coerce
-    .number()
-    .int()
-    .refine((v) => v > 0 || v === -1, 'Must be positive or -1 for no expiry')
-    .default(-1),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -62,7 +57,6 @@ export function loadEnv(): Env {
     CHROMIUM_WS_ENDPOINT: process.env.CHROMIUM_WS_ENDPOINT,
     CHROME_PATH: process.env.CHROME_PATH,
     SESSION_TTL: process.env.SESSION_TTL,
-    COOKIE_TTL: process.env.COOKIE_TTL,
   };
   _env = envSchema.parse(raw);
   return _env;
