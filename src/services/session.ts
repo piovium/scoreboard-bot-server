@@ -65,6 +65,7 @@ export class SessionManager {
     const ttl = this.getTtl(state);
     const multi = redis.multi().hset(key, 'state', state);
     if (ttl > 0) multi.expire(key, ttl);
+    else multi.persist(key);
     await multi.exec();
 
     logger.info({ userId, state }, 'Session state updated');
