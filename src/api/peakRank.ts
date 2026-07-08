@@ -1,16 +1,13 @@
 import type { Context } from 'hono';
 import { getSelectedRole, queryPeakRank } from '../services/gameRecords.ts';
 import { sessionManager } from '../services/session.ts';
-import { NotLoggedInError, ValidationError } from '../lib/errors.ts';
+import { ValidationError } from '../lib/errors.ts';
 import { logger } from '../lib/logger.ts';
 
 export async function peakRank(c: Context): Promise<Response> {
   const userId = c.get('userId') as string;
 
-  const loggedIn = await sessionManager.isLoggedIn(userId);
-  if (!loggedIn) {
-    throw new NotLoggedInError('User must be logged in to query peak rank');
-  }
+  await sessionManager.assertLoggedIn(userId, 'User must be logged in to query peak rank');
 
   const role = await getSelectedRole(userId);
   if (!role) {

@@ -1,6 +1,7 @@
 import { getRedis } from '../lib/redis.ts';
 import { getEnv } from '../config.ts';
 import { logger } from '../lib/logger.ts';
+import { NotLoggedInError } from '../lib/errors.ts';
 import type { SessionState, SessionData } from '../types.ts';
 import { randomUUID } from 'node:crypto';
 
@@ -86,6 +87,18 @@ export class SessionManager {
   async isLoggedIn(userId: string): Promise<boolean> {
     const session = await this.getSession(userId);
     return session?.state === 'LOGGED_IN';
+  }
+
+  async assertLoggedIn(userId: string, context: string): Promise<void> {
+    const session = await this.getSession(userId);
+    if (!session) {
+      logger.warn({ userId, context }, 'Not logged in: session key not found');
+      throw new NotLoggedInError(`${context}: userId=${userId}, reason=session key not found`);
+    }
+    if (session.state !== 'LOGGED_IN') {
+      logger.warn({ userId, context, state: session.state }, 'Not logged in: session state not LOGGED_IN');
+      throw new NotLoggedInError(`${context}: userId=${userId}, reason=state=${session.state}`);
+    }
   }
 
   private sessionToHash(session: SessionData): Record<string, string> {

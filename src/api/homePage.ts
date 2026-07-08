@@ -1,16 +1,13 @@
 import type { Context } from 'hono';
 import { getSelectedRole, queryHomePage } from '../services/gameRecords.ts';
 import { sessionManager } from '../services/session.ts';
-import { NotLoggedInError, ValidationError } from '../lib/errors.ts';
+import { ValidationError } from '../lib/errors.ts';
 import { logger } from '../lib/logger.ts';
 
 export async function homePage(c: Context): Promise<Response> {
   const userId = c.get('userId') as string;
 
-  const loggedIn = await sessionManager.isLoggedIn(userId);
-  if (!loggedIn) {
-    throw new NotLoggedInError('User must be logged in to query home page');
-  }
+  await sessionManager.assertLoggedIn(userId, 'User must be logged in to query home page');
 
   const role = await getSelectedRole(userId);
   if (!role) {

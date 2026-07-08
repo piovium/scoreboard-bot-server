@@ -1,6 +1,6 @@
 import { renderToPng } from '../renderer/render.ts';
 import { CardPage } from '../renderer/templates/Card.tsx';
-import { NotLoggedInError, ValidationError } from '../lib/errors.ts';
+import { ValidationError } from '../lib/errors.ts';
 import { logger } from '../lib/logger.ts';
 import type { Context } from 'hono';
 import { sessionManager } from '../services/session.ts';
@@ -18,8 +18,7 @@ export async function render(c: Context): Promise<Response> {
 
   if (!userId) throw new ValidationError('userId is required');
 
-  const loggedIn = await sessionManager.isLoggedIn(userId);
-  if (!loggedIn) throw new NotLoggedInError('User must be logged in to render card');
+  await sessionManager.assertLoggedIn(userId, 'User must be logged in to render card');
 
   let role = await getSelectedRole(userId);
   if (!role) {
