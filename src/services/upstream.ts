@@ -116,6 +116,7 @@ export class UpstreamClient {
         return { data, headers: response.headers, status: response.status };
       } catch (err) {
         clearTimeout(timer);
+        if (err instanceof SessionExpiredError) throw err;
         lastError = err;
         logger.warn(
           { userId, url, attempt, err },
@@ -203,6 +204,7 @@ export class UpstreamClient {
       } catch (err) {
         clearTimeout(timer);
         if (err instanceof UpstreamError) throw err;
+        if (err instanceof SessionExpiredError) throw err;
         lastError = err;
         logger.warn(
           { userId, url, attempt, err },
