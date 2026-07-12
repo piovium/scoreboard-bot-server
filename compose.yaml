@@ -1,9 +1,6 @@
 services:
   scoreboard-app:
     build: .
-    container_name: scoreboard-render-middleware
-    ports:
-      - "${PORT:-3000}:3000"
     environment:
       - PORT=${PORT:-3000}
       - LOG_LEVEL=${LOG_LEVEL:-info}
