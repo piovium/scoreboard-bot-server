@@ -1,9 +1,9 @@
 services:
-  app:
+  scoreboard-app:
     build: .
-    container_name: render-middleware
+    container_name: scoreboard-render-middleware
     ports:
-      - '${PORT:-3000}:3000'
+      - "${PORT:-3000}:3000"
     environment:
       - PORT=${PORT:-3000}
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -18,36 +18,36 @@ services:
       - DEVICE_NAME=${DEVICE_NAME:-Chrome}
       - DEVICE_MODEL=${DEVICE_MODEL:-Chrome 149.0.0.0}
       - DEVICE_OS=${DEVICE_OS:-Windows 10 64-bit}
-      - REDIS_URL=redis://redis:6379/0
-      - CHROMIUM_WS_ENDPOINT=http://chromium:9222
+      - REDIS_URL=redis://scoreboard-redis:6379/0
+      - CHROMIUM_WS_ENDPOINT=http://scoreboard-chromium:9222
       - SESSION_TTL=${SESSION_TTL:-300}
     depends_on:
-      redis:
+      scoreboard-redis:
         condition: service_healthy
-      chromium:
+      scoreboard-chromium:
         condition: service_started
     restart: unless-stopped
 
-  redis:
+  scoreboard-redis:
     image: redis:7-alpine
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-    container_name: render-middleware-redis
+    container_name: scoreboard-render-middleware-redis
     volumes:
-      - redis_data:/data
+      - scoreboard_redis_data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
     restart: unless-stopped
 
-  chromium:
+  scoreboard-chromium:
     build:
       context: .
       dockerfile: Dockerfile.chromium
-    image: dyebleach-chromium:latest
-    container_name: render-middleware-chromium
+    image: scoreboard-dyebleach-chromium:latest
+    container_name: scoreboard-render-middleware-chromium
     environment:
       - TZ=${TZ:-Asia/Shanghai}
     command:
@@ -57,4 +57,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  redis_data:
+  scoreboard_redis_data:
