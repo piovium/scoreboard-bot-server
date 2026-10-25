@@ -1,4 +1,4 @@
-# ladder-query API
+# scoreboard-bot-server
 
 中间层服务，为 SNS 机器人提供米哈游数据查询与图片渲染能力。
 

@@ -18,7 +18,7 @@ export function QrCodePage(props: QrCodeProps) {
           <p class="text-sm text-gray-500 text-center">打开<span class="text-yellow-600">米游社/游戏/云游戏App</span>，扫一扫登录</p>
           <p class="text-xs text-gray-400 text-center mt-2">二维码失效时间：{outdateTime}</p>
           <p class="text-xs text-gray-400 text-center mt-2">扫描该二维码登录的账户将与 {props.userId} 关联</p>
-          <p class="text-xs text-gray-400 text-center mt-2">登录即视为授权 dyebleach 使用您的七圣天梯数据</p>
+          <p class="text-xs text-gray-400 text-center mt-2">登录即视为授权 scoreboard-bot-server 使用您的七圣天梯数据</p>
         </div>
       </div>
     </Layout>
