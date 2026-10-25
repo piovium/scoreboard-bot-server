@@ -29,7 +29,7 @@ services:
     image: redis:7-alpine
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-    container_name: scoreboard-render-middleware-redis
+    container_name: scoreboard-bot-server-redis
     volumes:
       - scoreboard_redis_data:/data
     healthcheck:
@@ -43,8 +43,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.chromium
-    image: scoreboard-dyebleach-chromium:latest
-    container_name: scoreboard-render-middleware-chromium
+    image: scoreboard-bot-server-chromium:latest
+    container_name: scoreboard-bot-server-chromium
     environment:
       - TZ=${TZ:-Asia/Shanghai}
     command:

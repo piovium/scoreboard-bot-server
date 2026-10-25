@@ -135,7 +135,7 @@ export function CardPage(props: CardProps) {
           </div>
         </div>
         <div class="text-center text-xs text-gray-300 pb-4">
-          数据来自原神赛事，由 dyebleach 渲染，数据查询时间：{renderTime}
+          数据来自原神赛事，由 scoreboard-bot-server 渲染，数据查询时间：{renderTime}
         </div>
       </div>
     </Layout>
